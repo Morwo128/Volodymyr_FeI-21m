@@ -1,0 +1,105 @@
+.dashboard {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 24px;
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+}
+
+.account {
+    font-size: 0.95rem;
+    color: #64748b;
+    margin: 8px 0 24px;
+    text-align: center;
+}
+
+.dashboard h1 {
+    text-align: center;
+    margin: 0 0 20px;
+    color: #0f172a;
+}
+
+/* Layout */
+.device {
+    background: linear-gradient(180deg, #ffffff, #f8fafc);
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 18px;
+    margin-top: 22px;
+    box-shadow: 0 10px 20px rgba(2, 6, 23, 0.04);
+    transition: box-shadow .2s ease, transform .1s ease;
+}
+
+.device:hover {
+    box-shadow: 0 12px 28px rgba(2, 6, 23, 0.06);
+    transform: translateY(-1px);
+}
+
+.device img {
+    width: 84px;
+    height: 84px;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 8px rgba(15, 23, 42, 0.15));
+}
+
+.device h2 {
+    margin: 10px 0 14px;
+    font-size: 1.25rem;
+    color: #0f172a;
+}
+
+.device input[type="number"],
+.device input[type="text"] {
+    padding: 10px 12px;
+    margin: 10px 8px 10px 0;
+    width: 220px;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    background: #fff;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.device input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+}
+
+.device button {
+    margin: 6px 8px 6px 0;
+    padding: 10px 14px;
+    border: 1px solid #1d4ed8;
+    background: linear-gradient(180deg, #3b82f6, #2563eb);
+    color: white;
+    cursor: pointer;
+    border-radius: 10px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    transition: filter .15s ease, transform .05s ease, box-shadow .15s ease;
+}
+
+.device button:hover {
+    filter: brightness(1.03);
+    box-shadow: 0 6px 14px rgba(37, 99, 235, 0.25);
+}
+
+.device button:active {
+    transform: translateY(1px);
+}
+
+.history {
+    list-style: none;
+    padding: 0;
+    margin-top: 14px;
+    font-size: 0.95rem;
+    text-align: left;
+    color: #0f172a;
+}
+
+.history li {
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 10px;
+}

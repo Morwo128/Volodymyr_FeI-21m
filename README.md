@@ -1,36 +1,222 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📘 Edge Device Blockchain Dashboard
 
-## Getting Started
+> Веб-застосунок на Next.js, що дозволяє відстежувати температуру чайника й стан дверного замка через приватний блокчейн.
+> Наприклад: "Веб-застосунок для збереження нотаток з авторизацією користувача."
 
-First, run the development server:
+---
+
+## 👤 Автор
+
+- **ПІБ**: Гладій Володимир
+- **Група**: ФЕІ-21м
+- **Керівник**: Кушнір Олексій Олександрович, кандидат фізико-математичних наук, доцент кафедри радіофізики та комп’ютерних технологій, інженер 1 категорії Лабораторії (4) Радіофізики і комп’ютерних технологій
+- **Дата виконання**: [2025]
+
+---
+
+## 📌 Загальна інформація
+
+- **Тип проєкту**: Вебзастосунок для моніторингу IoT-пристроїв
+- **Мова програмування**: JavaScript (Next.js, Node.js)
+- **Фреймворки / Бібліотеки**: Next.js, React, Tailwind (за потреби)
+- **Бекенд**: Node.js із власноруч реалізованим приватним блокчейном для зберігання історії подій
+
+---
+
+## 🧠 Опис функціоналу
+
+- 📡 Надсилання даних від IoT-пристроїв (чайник, замок) у приватний блокчейн
+- 🔐 Шифрування блоків і можливість локальної розшифровки історії
+- 🔄 Перемикання стану замка з миттєвим записом у ланцюжок блоків
+- 🌡 Перегляд історії температур чайника та подій замка
+- 🌐 REST API між Next.js frontend та Node.js blockchain backend
+
+---
+
+## 🧱 Опис основних класів / файлів
+
+| Клас / Файл     | Призначення |
+|----------------|-------------|
+| `app/page.js` | Головна сторінка Next.js, підключає IoT-дешборд |
+| `app/components/EdgeDeviceApp.jsx` | Інтерфейс для чайника і замка, виклики REST API |
+| `app/AdminPanel/page.jsx` | Адмін-панель для керування блокчейн-вузлом і гаманцями |
+| `Blockchain.js` | Node.js сервер з приватним блокчейном, шифруванням і REST API |
+
+---
+
+## ▶️ Як запустити проєкт "з нуля"
+
+### 1. Встановлення інструментів
+
+- Node.js v22.13.0 + npm v10.9.2
+
+### 2. Клонування репозиторію
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/Morwo128/Volodymyr_FeI-21m.git
+cd Volodymyr_FeI-21m
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 3. Встановлення залежностей
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+npm install
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 4. Запуск
 
-## Learn More
+```bash
+# 1. Стартуємо приватний блокчейн-вузол (API на PORT=3002)
+npm run node1
 
-To learn more about Next.js, take a look at the following resources:
+# 2. У новій вкладці — запускаємо Next.js застосунок
+npm run dev
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+> 💡 Щоб протестувати мережу з кількома вузлами, можна паралельно запустити `npm run node2` та `npm run node3`, які стартують додаткові екземпляри блокчейна на інших портах/з вказаними пір-адресами.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Після цього:
+# - UI доступний на http://localhost:3000
+# - Blockchain API (вузол 1) слухає на http://localhost:3001
+# - Blockchain API (вузол 1) слухає на http://localhost:3002
 
-## Deploy on Vercel
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## 🔌 API приклади
+### 👛 Створення гаманця (`POST /wallets/create`)
+
+```json
+{
+  "ownerToken": "12345",
+  "walletId": "wallet-demo",
+  "label": "Lab device"
+}
+```
+
+> Важливо: для виклику потрібен заголовок `Authorization: Bearer 12345`, де `12345` — значення `OWNER_TOKEN`, з яким стартував вузол.
+
+**Response:**
+
+```json
+{
+  "walletId": "wallet-demo",
+  "publicKey": "-----BEGIN PUBLIC KEY-----\\nMIIBIjA...\\n-----END PUBLIC KEY-----",
+  "privateKey": "-----BEGIN PRIVATE KEY-----\\nMIIEvQ...\\n-----END PRIVATE KEY-----",
+  "label": "Lab device"
+}
+```
+
+---
+{"deviceId":"kettle","payload":{"type":"kettleTemp","temperature":42},
+
+
+### 🔗 Створення блоку (`POST /blocks/create`)
+
+```json
+{
+  "deviceId": "kettle",
+  "payload": { "type": "kettleTemp", "temperature": 68 },
+  "authorPublicKeyPem": "-----BEGIN PUBLIC KEY-----\\nMIIBIjA...\\n-----END PUBLIC KEY-----",
+"authorPrivateKeyPem": "-----BEGIN PRIVATE KEY-----\\nMIIEvQ...\\n-----END PRIVATE KEY-----",
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "block": {
+    "index": 5,
+    "hash": "…",
+    "encryptedPayload": { "ciphertext": "…", "iv": "…", "tag": "…" }
+  }
+}
+```
+
+---
+
+### 🔐 Дешифрування блоку (`POST /blocks/decrypt`)
+
+```json
+{
+  "index": 1,
+  "deviceId": "kettle"
+}
+```
+
+**Response:**
+
+```json
+{
+  "plaintext": "{\"type\":\"kettleTemp\",\"temperature\":68}"
+}
+```
+
+---
+
+### 📦 Останній блок для пристрою (`GET /blocks/latest-for-device`)
+
+```
+/blocks/latest-for-device?deviceId=kettle&includePlaintext=true
+```
+
+**Response:**
+
+```json
+{
+  "block": {
+    "index": 2,
+    "timestamp": "2025-11-25T15:17:27.574Z",
+    "prevHash": "8d2dabee4409807de029d58709905853567649b8fa568adb7b26cc78c438d993",
+    "encryptedPayload": {
+      "ciphertext": "jbDMLc+1EaWGeDGfAmICeUdvPfpV0cdQeMktZ7SxUfazsggSc+A=",
+      "iv": "2yiBK1Hr4LB8tYfi",
+      "tag": "hTEaYqOYOc94StuqPpwJLQ=="
+    },
+    "authorPublicKeyPem": "-----BEGIN PUBLIC KEY-----\nMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAET5uhB8v11wMOSuiORU1maypRqNs9QQQl\nVRTRCnSAJh6qvDbONKrLj7a4AZPx94pRfQRYnyepx86HMprkm/n2iA==\n-----END PUBLIC KEY-----",
+    "signature": "MEUCIG6sJr8xQtlWzhk5IBX1LRYlG5fJFyfFFRRQO+6seO9OAiEAovoKYtHd0JLHsOKzg0rV2chsvKaFBAR5hDD6jad1x28=",
+    "nonce": 0,
+    "hash": "9d5dd0e9f81563515f24feccaa105cfc8153f1270c53d98a92108948c4d66f60"
+  },
+  "plaintext": "{\"type\":\"kettleTemp\",\"temperature\":42}"
+}
+```
+
+---
+
+
+## 🖱️ Інструкція для користувача
+
+1. **Головна сторінка (`app/page.js`)**
+   - Вгорі показується статус підключеного вузла блокчейна.
+   - Блок «Чайник» дозволяє ввести температуру та надіслати її кнопкою `Надіслати температуру`, а також переглянути історію (`Показати історію`).
+   - Блок «Дверний замок» відображає поточний стан (`Locked/Unlocked`) і має кнопку `Перемкнути стан` для запису нової події у блокчейн.
+
+2. **Адмін-панель (`/AdminPanel`)**
+   - Секції для викликів усіх REST API: створення блоків, дешифрування, перегляд історії, створення гаманців.
+   - Кожна форма має кнопку `Submit`/`Refresh`, а результати відображаються у блоках `Response`.
+
+3. **Сторінка тестів (`/test`)**
+   - Можна моделювати навантаження: запускати серії запитів для оцінки пропускної здатності або симулювати DDoS-атаку на локальну мережу.
+
+4. **Поради**
+   - Перед взаємодією з UI переконайтеся, що відповідний блокчейн-вузол (`npm run node1`) запущений.
+   - Для тестів з кількома вузлами запускайте одночасно кілька npm-скриптів (`node2`, `node3`).
+
+---
+
+## 📷 Приклади / скриншоти
+
+- Головна сторінка  
+  ![Головна сторінка](./screenshots/Screenshot%202025-11-25%20at%2017.47.22.png)
+- Admin panel
+ ![Головна сторінка](./screenshots/Screenshot%202025-11-25%20at%2017.17.51.png)
+- Тест пропускної здатності
+ ![Головна сторінка](./screenshots/Screenshot%202025-11-25%20at%2015.32.52.png)
+
+## 🧾 Використані джерела / література
+
+- Express.js гайд
+- Next.js офіційний гайд (docs.nextjs.org)
+- Ethereum.org — документація

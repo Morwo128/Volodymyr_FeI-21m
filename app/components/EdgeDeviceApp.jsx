@@ -9,7 +9,8 @@ const API_BASE = "http://localhost:3002";
 // );
 export default function EdgeDeviceApp() {
   const [account, setAccount] = useState("");
-  const [authorWalletId, setAuthorWalletId] = useState("");
+  const [authorPublicKeyPem, setAuthorPublicKeyPem] = useState("");
+  const [authorPrivateKeyPem, setAuthorPrivateKeyPem] = useState("");
   const [kettleTemp, setKettleTemp] = useState("");
   const [kettleHistory, setKettleHistory] = useState([]);
   const [lockHistory, setLockHistory] = useState([]);
@@ -28,13 +29,32 @@ export default function EdgeDeviceApp() {
     init();
   }, []);
 
+  const getAuthorFields = () => {
+    if (!authorPublicKeyPem.trim() || !authorPrivateKeyPem.trim()) {
+      return null;
+    }
+    return {
+      authorPublicKeyPem: authorPublicKeyPem.trim(),
+      authorPrivateKeyPem: authorPrivateKeyPem.trim(),
+    };
+  };
+
   const sendTemperature = async () => {
     try {
+      const authorFields = getAuthorFields();
+      if (!authorFields) {
+        alert("Вставте обидва PEM ключі перед відправкою блоку.");
+        return;
+      }
       const payload = { type: "kettleTemp", temperature: Number(kettleTemp) };
       const r = await fetch(`${API_BASE}/blocks/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ deviceId: "kettle", payload, authorWalletId: authorWalletId || undefined })
+        body: JSON.stringify({
+          deviceId: "kettle",
+          payload,
+          ...authorFields,
+        })
       });
       if (!r.ok) throw new Error("create failed");
       alert("Температура надіслана!");
@@ -47,12 +67,21 @@ export default function EdgeDeviceApp() {
 
   const toggleLock = async () => {
     try {
+      const authorFields = getAuthorFields();
+      if (!authorFields) {
+        alert("Вставте обидва PEM ключі перед відправкою блоку.");
+        return;
+      }
       const newLocked = !(lockStatus === "Locked");
       const payload = { type: "lockState", isLocked: newLocked };
       const r = await fetch(`${API_BASE}/blocks/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ deviceId: "lock", payload, authorWalletId: authorWalletId || undefined })
+        body: JSON.stringify({
+          deviceId: "lock",
+          payload,
+          ...authorFields,
+        })
       });
       if (!r.ok) throw new Error("create failed");
       alert("Стан замка змінено!");
@@ -133,23 +162,46 @@ export default function EdgeDeviceApp() {
       <h1>🔐 Розумні Пристрої на Блокчейні</h1>
       <p className="account">👤 Підключено: {account}</p>
 
-      <div style={{ marginBottom: 12 }}>
-        <label style={{ marginRight: 8 }}>
-          Author Wallet ID (optional):
-        </label>
-        <input
-          type="text"
-          placeholder="wallet-123 or leave empty"
-          value={authorWalletId}
-          onChange={(e) => setAuthorWalletId(e.target.value)}
-          style={{ padding: '6px 8px', width: 260 }}
-        />
-        <button
-          onClick={() => setAuthorWalletId("")}
-          style={{ marginLeft: 8, padding: '6px 8px' }}
-        >
-          Clear
-        </button>
+      <div className="device auth-card">
+        <div className="auth-card__header">
+          <div>
+            <h2>PEM-підпис блоків</h2>
+            <p>Вставте пару ключів у форматі PKCS8. Вони зберігаються лише локально.</p>
+          </div>
+          <div className="auth-card__actions">
+            <button
+              type="button"
+              className="ghost"
+              onClick={() => {
+                setAuthorPublicKeyPem("");
+                setAuthorPrivateKeyPem("");
+              }}
+            >
+              Очистити
+            </button>
+          </div>
+        </div>
+        <div className="pem-grid">
+          <label>
+            Public key
+            <textarea
+              placeholder="-----BEGIN PUBLIC KEY-----"
+              value={authorPublicKeyPem}
+              onChange={(e) => setAuthorPublicKeyPem(e.target.value)}
+            />
+          </label>
+          <label>
+            Private key
+            <textarea
+              placeholder="-----BEGIN PRIVATE KEY-----"
+              value={authorPrivateKeyPem}
+              onChange={(e) => setAuthorPrivateKeyPem(e.target.value)}
+            />
+          </label>
+        </div>
+        <small>
+          Скопіюйте ключі з відповіді `/wallets/create` або використайте власну пару `secp256k1`.
+        </small>
       </div>
       <div className="device">
         <img src={"/kettle.png"} alt="Kettle" />

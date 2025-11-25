@@ -7,8 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "node1": "PORT=3001 PEERS=http://localhost:3002 OWNER_TOKEN=12345 node ../Blockchain.js",
-    "node2": "PORT=3002 OWNER_TOKEN=12345 node ./Blockchain.js",
+    "node1": "PORT=3002 OWNER_TOKEN=12345 node ./Blockchain.js",
+    "node2": "PORT=3001 PEERS=http://localhost:3002 OWNER_TOKEN=12345 node ./Blockchain.js",
     "node3": "PORT=3002 PEERS=http://localhost:3001 OWNER_TOKEN=12345 node ./Blockchain.js"
   },
   "dependencies": {
